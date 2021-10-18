@@ -1,125 +1,9 @@
 import vk_api
-from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+from vk_api.keyboard import VkKeyboard
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_api.utils import get_random_id
-
-
-class Stage:
-    def __init__(self, bot, event):
-        self.bot = bot
-        self.message = event.obj['message']
-        self.user_id = self.message['peer_id']
-        self.request = self.message['text'].lower()
-
-    def action(self):
-        pass
-
-
-class StageAuthors(Stage):
-
-    def action(self):
-        if self.request == 'предыдущий':
-            if number - 1 == 0:
-                self.bot.write_msg(self.user_id, "Это первый в списке артист")
-                outOfList = True
-            else:
-                number -= 1
-
-        elif self.request == 'следующий':
-            if number + 1 > len(artist):
-                self.bot.write_msg(self.user_id, "Это последний в списке артист")
-                outOfList = True
-            else:
-                number += 1
-
-        if self.request.isdigit() or self.request in ('следующий', 'предыдущий'):
-            if self.request.isdigit():
-                number = int(self.request)
-
-            if outOfList:
-                outOfList = False
-
-            elif number <= len(artist):
-                pass
-                # artistLabel = str(number) + '. ' + artist[number - 1][0]
-                # write_msg(user_id, artistLabel)
-                # send_attachment(user_id, artist[number - 1][1])
-                # for i in range(2, 5):
-                #     if artist[number - 1][i] is not None:
-                #         send_attachment(user_id, artist[number - 1][i])
-                # keyboard = create_keyboard_artist()
-
-            else:
-                self.bot.write_msg(self.user_id, "Артиста с таким номером не существует")
-        else:
-            self.bot.write_msg(self.user_id, 'Ошибка ввода. Напишите "Меню"')
-
-
-class StageMenu(Stage):
-    def action(self):
-        if self.request in ("sintez", "синтез"):
-            self.bot.write_msg(self.user_id, '"SINTEZ" - это музакальное объединение '
-                                             "Владимирских исполнителей...")
-
-        elif self.request == "концерт":
-            self.bot.write_msg(self.user_id, "http://surl.li/akzwe")
-            self.bot.write_msg(self.user_id, "Концерт состоиться 14 ноября в 18:00 \n"
-                                             "По адресу Дворянская улица, 27Ак2, Владимир")
-
-        elif self.request == "артисты":
-            artistList = ''
-            # for i in range(len(artist)):
-            #     artistList += str(i + 1) + '. ' + artist[i][0] + '\n'
-            # write_msg(user_id, artistList)
-            # write_msg(user_id, "Введите номер артиста:")
-            floor = StageAuthors
-
-        elif self.request == 'закрыть':
-            keyboard = VkKeyboard(one_time=False)
-            self.bot.write_msg(self.user_id, 'Чтобы снова открыть меню, напишите "Меню"', keyboard.get_empty_keyboard(),
-                               True)
-
-
-class Keyboards:
-    def __init__(self):
-        self.menu = self.create_kb_menu()
-        self.artists = self.create_kb_artists()
-
-    def create_kb_menu(self) -> VkKeyboard:
-        keyboard = VkKeyboard(one_time=False)
-        keyboard.add_button("SINTEZ", VkKeyboardColor.PRIMARY)
-
-        keyboard.add_line()
-        keyboard.add_button("Концерт", VkKeyboardColor.PRIMARY)
-
-        keyboard.add_line()
-        keyboard.add_button("Артисты", VkKeyboardColor.PRIMARY)
-
-        keyboard.add_line()
-        keyboard.add_button("Закрыть", VkKeyboardColor.NEGATIVE)
-
-        return keyboard
-
-    def create_kb_artists(self) -> VkKeyboard:
-        keyboard = VkKeyboard(one_time=False)
-        keyboard.add_button("Предыдущий", VkKeyboardColor.PRIMARY)
-        keyboard.add_button("Следующий", VkKeyboardColor.PRIMARY)
-
-        keyboard.add_line()
-        keyboard.add_button("Назад", VkKeyboardColor.NEGATIVE)
-        # self.write_msg(user_id, 'Чтобы вернуться назад нажмите "Назад"', keyboard)
-
-        return keyboard
-
-    # Создание отдельного меню с кнопкой назад
-    # def create_keyboard_back():
-    #     keyboard = VkKeyboard(one_time=False)
-    #     keyboard.add_button("Назад", VkKeyboardColor.NEGATIVE)
-    #     write_msg(user_id, "Чтобы вернуться назад нажмите Назад", keyboard)
-    #
-    #     return keyboard
-
-    # Создание меню переключения артистов
+from keyboards import Keyboards
+from stages import StageMenu
 
 
 class Bot:
@@ -134,13 +18,14 @@ class Bot:
         self.cashed_kb = Keyboards()
 
     def run(self):
+        print("Bot запущен...")
         for event in self.longpoll.listen():
             # Если вступил в сообщество
             if event.type == VkBotEventType.GROUP_JOIN:
                 keyboard = VkKeyboard(one_time=False)
                 user_id = event.obj.user_id
                 self.write_msg(user_id, "ГС\n"
-                                   'Чтобы узнать больше, напиши "Меню"', keyboard.get_empty_keyboard(), True)
+                                        'Чтобы узнать больше, напиши "Меню"', keyboard.get_empty_keyboard(), True)
 
             # Если появилось новое сообщение
             if event.type == VkBotEventType.MESSAGE_NEW:
@@ -151,16 +36,17 @@ class Bot:
                 if request in ("привет", "здарова", "добрый день", "хай", "здравствуйте", "ку", "здорово"):
                     keyboard = self.cashed_kb.menu
                     self.write_msg(user_id, "Команда SINTEZ приветствует тебя!\n"
-                                       "В меню ты можешь найти самую важную информацию:", keyboard)
-                    floor = StageMenu
+                                            "В меню ты можешь найти самую важную информацию:", keyboard)
+                    self.stage = StageMenu
 
                 elif request in ("menu", "меню", "назад"):
                     keyboard = self.cashed_kb.menu
                     self.write_msg(user_id, "Выберите пункт из меню:", keyboard)
-                    floor = StageMenu
+                    self.stage = StageMenu
 
                 else:
-                    self.write_msg(user_id, 'Для входа в меню напишите "Меню"')
+                    self.stage(self, event).action()
+                    # self.write_msg(user_id, 'Для входа в меню напишите "Меню"')
 
     def write_msg(self, user_id, msg, keyboard=None, is_empty_msg=False) -> None:
         methodinfo = {
