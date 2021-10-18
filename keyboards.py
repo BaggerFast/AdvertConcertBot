@@ -5,6 +5,11 @@ class Keyboards:
     def __init__(self):
         self.menu = self.create_kb_menu()
         self.artists = self.create_kb_artists()
+        self.empty = self.create_kb_empty()
+
+    def create_kb_empty(self):
+        keyboard = VkKeyboard(one_time=False)
+        return keyboard.get_empty_keyboard()
 
     def create_kb_menu(self) -> VkKeyboard:
         keyboard = VkKeyboard(one_time=False)
@@ -31,13 +36,3 @@ class Keyboards:
         # self.write_msg(user_id, 'Чтобы вернуться назад нажмите "Назад"', keyboard)
 
         return keyboard
-
-    # Создание отдельного меню с кнопкой назад
-    # def create_keyboard_back():
-    #     keyboard = VkKeyboard(one_time=False)
-    #     keyboard.add_button("Назад", VkKeyboardColor.NEGATIVE)
-    #     write_msg(user_id, "Чтобы вернуться назад нажмите Назад", keyboard)
-    #
-    #     return keyboard
-
-    # Создание меню переключения артистов

@@ -1,5 +1,5 @@
 from vk_api.keyboard import VkKeyboard
-from stages import Stage
+from stages import Stage, StageAuthors
 
 
 class StageMenu(Stage):
@@ -12,29 +12,30 @@ class StageMenu(Stage):
             "закрыть": self.close,
         }
 
-    def action(self):
-        if self.request in ("sintez", "синтез"):
+    def action(self) -> bool:
+        if self.command in ("sintez", "синтез"):
             self.bot.write_msg(self.user_id, '"SINTEZ" - это музакальное объединение '
                                              "Владимирских исполнителей...")
-        elif self.request in self.messages.keys():
-            self.messages[self.request]()
+        elif self.command in self.messages.keys():
+            self.messages[self.command]()
+        else:
+            return False
+        return True
 
     def concert(self):
-        self.bot.write_msg(self.user_id, "http://surl.li/akzwe")
-        self.bot.write_msg(self.user_id, "Концерт состоиться 14 ноября в 18:00 \n"
-                                         "По адресу Дворянская улица, 27Ак2, Владимир")
+        # ссылка на яндекс карты
+        site = "https://yandex.ru/maps/192/vladimir/house/dvoryanskaya_ulitsa_27ak2/YEkYdQ9pTU0BQFtsfX1zd3RiZA==/?ll=40" \
+               ".389486%2C56.126810&source=wizgeo&utm_medium=maps-desktop&utm_source=serp&z=17.08"
+        text = "Концерт состоиться 14 ноября в 18:00 \n По адресу Дворянская улица, 27Ак2, Владимир"
+        self.bot.write_msg(self.user_id, f"{site}\n{text}")
 
     def authors(self):
-        pass
-        artistList = ''
-
-        # for i in range(len(artist)):
-        #     artistList += str(i + 1) + '. ' + artist[i][0] + '\n'
-        # write_msg(user_id, artistList)
-        # write_msg(user_id, "Введите номер артиста:")
-        # floor = StageAuthors
+        artists = ''
+        for number, name, other in self.bot.db.get_authors():
+            artists += f'{number + 1}. {name}\n'
+        artists += "\nВведите номер артиста:"
+        self.bot.write_msg(self.user_id, artists)
+        self.bot.stage = StageAuthors
 
     def close(self):
-        keyboard = VkKeyboard(one_time=False)
-        self.bot.write_msg(self.user_id, 'Чтобы снова открыть меню, напишите "Меню"',
-                           keyboard.get_empty_keyboard(), True)
+        self.bot.write_msg(self.user_id, 'Чтобы снова открыть меню, напишите "Меню"', self.bot.cashed_kb.empty, True)
