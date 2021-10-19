@@ -30,10 +30,7 @@ class Bot:
                 event_data[event.type](event)
 
     def group_join_action(self, event):
-        keyboard = VkKeyboard(one_time=False)
-        user_id = event.obj.user_id
-        self.write_msg(user_id, "ГС\n"
-                                'Чтобы узнать больше, напиши "Меню"', keyboard.get_empty_keyboard(), True)
+        self.send_msg(event.obj.user_id, 'ГС\nЧтобы узнать больше, напиши "Меню"', self.cashed_kb.empty)
 
     def new_msg_action(self, event):
         message = event.obj['message']
@@ -41,43 +38,28 @@ class Bot:
         command = message['text'].strip().lower()
 
         if command in ("привет", "здарова", "добрый день", "хай", "здравствуйте", "ку", "здорово"):
-            keyboard = self.cashed_kb.menu
-            self.write_msg(user_id, "Команда SINTEZ приветствует тебя!\n"
-                                    "В меню ты можешь найти самую важную информацию:", keyboard)
+            self.send_msg(user_id, "Команда SINTEZ приветствует тебя!\n"
+                                   "В меню ты можешь найти самую важную информацию:", self.cashed_kb.menu)
             self.stage = StageMenu
         elif command in ("menu", "меню", "назад"):
-            keyboard = self.cashed_kb.menu
-            self.write_msg(user_id, "Выберите пункт из меню:", keyboard)
+            self.send_msg(user_id, "Выберите пункт из меню:", self.cashed_kb.menu)
             self.stage = StageMenu
         else:
             if not self.stage(self, event).action():
-                self.write_msg(user_id, 'Ошибка ввода. Напишите "Меню"')
+                self.send_msg(user_id, 'Ошибка ввода. Напишите "Меню"')
 
-    def write_msg(self, user_id, msg, keyboard=None, is_empty_msg=False) -> None:
-        methodinfo = {
+    def send_msg(self, user_id, msg, keyboard: vk_api.keyboard = None, attachment: str = None) -> None:
+        method_info = {
             'user_id': user_id,
             'message': msg,
-            'random_id': get_random_id()
-        }
-
-        if is_empty_msg == True:
-            methodinfo['keyboard'] = keyboard
-
-        elif keyboard is not None:
-            methodinfo['keyboard'] = keyboard.get_keyboard()
-
-        else:
-            methodinfo = methodinfo
-
-        self.vk.method('messages.send', methodinfo)
-
-    def send_attachment(self, peer_id, attachment, message=''):
-        methodinfo = {
-            'peer_id': peer_id,
-            'attachment': attachment,
             'random_id': get_random_id(),
-            'message': message,
         }
+        if keyboard and keyboard != self.cashed_kb.empty:
+            method_info['keyboard'] = keyboard.get_keyboard()
+        else:
+            method_info['keyboard'] = keyboard
 
-        self.vk.method('messages.send', methodinfo)
+        if attachment:
+            method_info['attachment'] = attachment
 
+        self.vk.method('messages.send', method_info)
