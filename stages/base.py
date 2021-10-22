@@ -1,9 +1,10 @@
+from misc import EventInfo
+
+
 class Stage:
-    def __init__(self, bot, event):
+    def __init__(self, bot, event: EventInfo):
         self.bot = bot
-        self.message = event.obj['message']
-        self.user_id = self.message['peer_id']
-        self.command = self.message['text'].strip().lower()
+        self.event = event
 
     def action(self) -> None:
-        pass
+        raise NotImplementedError

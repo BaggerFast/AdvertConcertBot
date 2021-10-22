@@ -1,31 +1,41 @@
-from sqlalchemy import create_engine, select, Table, Column, Integer, String, MetaData, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
 
 
 class Database:
+    Base = declarative_base()
+
+    class Tracks(Base):
+        __tablename__ = 'Tracks'
+        id = Column(Integer, primary_key=True)
+        track = Column(String(250), nullable=False)
+        author_id = Column(Integer, ForeignKey("Authors.id"))
+
+    class Author(Base):
+        __tablename__ = 'Authors'
+        id = Column(Integer, primary_key=True)
+        name = Column(String(250), nullable=False)
+        photo = Column(String(250), nullable=False)
+        music = relationship("Tracks")
+
+        def __repr__(self):
+            print(self.name)
+
     def __init__(self):
         self.engine = create_engine('sqlite:///database.db', echo=True)
-        meta = MetaData()
-        self.conn = self.engine.connect()
-        self.authors = Table('Authors', meta,
-                             Column('id', Integer, primary_key=True),
-                             Column('name', String(250), nullable=False),
-                             Column('photo', String(250), nullable=False)
-                             )
+        self.session = sessionmaker(bind=self.engine)()
 
-        self.music = Table('Tracks', meta,
-                           Column('id', Integer, primary_key=True),
-                           Column('track', String(250), nullable=False),
-                           Column('author_id', Integer, ForeignKey("Authors.id")),
-                           )
+    def __create(self):
+        self.Base.metadata.create_all(self.engine)
 
     def get_authors(self):
-        return self.conn.execute(self.authors.select())
+        return self.session.query(self.Author).all()
 
-    def get_authors_by_id(self, id):
-        try:
-            return list(self.conn.execute(self.authors.select().where(self.authors.c.id == id)))[0]
-        except IndexError:
-            return False
+    def get_authors_by_id(self, key):
+        return self.session.query(self.Author).filter(self.Author.id == key).one()
 
-    def get_music_by_author_id(self, author_id):
-        return self.conn.execute(select(self.music.c.track).where(self.music.c.author_id == author_id))
+
+if __name__ == "__main__":
+    a = Database()
+    a.get_authors(3)
