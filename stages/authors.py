@@ -8,7 +8,8 @@ class StageAuthors(Stage):
         author = self.bot.db.get_authors_by_id(number - 1)
         if author:
             attach = [author.photo]+[music.track for music in author.music]
-            self.bot.send_msg(self.event.user_id, f"{author.name}", attachment=attach, keyboard=self.bot.cashed_kb.artists)
+            self.bot.send_msg(self.event.user_id, f"{author.name}", attachment=attach,
+                              keyboard=self.bot.cashed_kb.artists)
         else:
             self.bot.send_msg(self.event.user_id, "Артиста с таким номером не существует")
 

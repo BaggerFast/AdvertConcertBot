@@ -1,6 +1,8 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
+from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
+
+from misc import Settings
 
 
 class Database:
@@ -23,7 +25,7 @@ class Database:
             print(self.name)
 
     def __init__(self):
-        self.engine = create_engine('sqlite:///database.db', echo=True)
+        self.engine = create_engine('sqlite:///database.db', echo=True if Settings.debug else False)
         self.session = sessionmaker(bind=self.engine)()
 
     def __create(self):
@@ -33,9 +35,12 @@ class Database:
         return self.session.query(self.Author).all()
 
     def get_authors_by_id(self, key):
-        return self.session.query(self.Author).filter(self.Author.id == key).one()
+        try:
+            return self.session.query(self.Author).filter(self.Author.id == key).one()
+        except exc.NoResultFound:
+            return False
 
 
 if __name__ == "__main__":
-    a = Database()
-    a.get_authors(3)
+    # use when we need use database
+    pass

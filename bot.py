@@ -1,13 +1,15 @@
+import traceback
+from datetime import datetime
 from typing import Union
-
 import vk_api
 from vk_api.keyboard import VkKeyboard
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_api.utils import get_random_id
 from database import Database
 from keyboards import Keyboards
-from misc import EventInfo
+from misc import EventInfo, Settings
 from stages import StageMenu, StageAuthors
+from fuzzywuzzy import fuzz
 
 
 class Bot:
@@ -26,25 +28,43 @@ class Bot:
 
     def run(self):
         print("Bot запущен...")
-        event_data = {
-            VkBotEventType.GROUP_JOIN: self.group_join_action,
-            VkBotEventType.MESSAGE_NEW: self.new_msg_action,
-        }
-        for event in self.longpoll.listen():
-            if event.type in event_data.keys():
-                event_data[event.type](event)
+        try:
+            event_data = {
+                VkBotEventType.GROUP_JOIN: self.group_join_action,
+                VkBotEventType.MESSAGE_NEW: self.new_msg_action,
+            }
+            for event in self.longpoll.listen():
+                if event.type in event_data.keys():
+                    event_data[event.type](event)
+        except Exception:
+            self.__logger()
+
+    def __logger(self):
+        if not Settings.debug:
+            with open(f"exception-{datetime.now().strftime('%m-%d-%Y-%H-%M-%S')}", "w") as file:
+                file.write(traceback.format_exc())
+                self.run()
+        else:
+            raise BaseException
 
     def group_join_action(self, event):
         self.send_msg(event.obj.user_id, 'ГС\nЧтобы узнать больше, напиши "Меню"', self.cashed_kb.empty)
 
+    def cheacker(self, command, words):
+        for word in words:
+            if fuzz.ratio(command, word) > 75:
+                return True
+        else:
+            return False
+
     def new_msg_action(self, event):
         request = EventInfo(event.obj['message'], event.obj['message']['peer_id'],
                             event.obj['message']['text'].strip().lower())
-        if request.command in ("привет", "здарова", "добрый день", "хай", "здравствуйте", "ку", "здорово"):
+        if self.cheacker(request.command, ("привет", "здарова", "добрый день", "хай", "здравствуйте", "ку", "здорово")):
             self.send_msg(request.user_id, "Команда SINTEZ приветствует тебя!\n"
                                            "В меню ты можешь найти самую важную информацию:", self.cashed_kb.menu)
             self.stage = self.Stage.menu(self, request)
-        elif request.command in ("menu", "меню"):
+        elif self.cheacker(request.command, ("menu", "меню")):
             self.send_msg(request.user_id, "Выберите пункт из меню:", self.cashed_kb.menu)
             self.stage = self.Stage.menu(self, request)
         else:
