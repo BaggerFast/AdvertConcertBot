@@ -1,12 +1,13 @@
+from misc import StateIndex
 from states import StateMenu, StateAuthors, StateAuthors2
 
 
 class StatesManager:
     states = {
-        0: None,
-        1: StateMenu,
-        2: StateAuthors,
-        3: StateAuthors2
+        StateIndex.default: None,
+        StateIndex.menu: StateMenu,
+        StateIndex.authors: StateAuthors,
+        StateIndex.authors2: StateAuthors2
     }
 
     @staticmethod

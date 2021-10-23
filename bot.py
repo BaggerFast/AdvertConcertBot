@@ -7,24 +7,12 @@ from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_api.utils import get_random_id
 from database import Database
 from keyboards import Keyboards
-from misc import EventInfo, Settings
-from states import StateMenu, StateAuthors, BaseState, StateAuthors2
-from fuzzywuzzy import fuzz
+from misc import EventInfo, Settings, StateIndex, words_compare
+from states import BaseState
 from states import StatesManager
 
 
-def words_compare(command, words):
-    for word in words:
-        if fuzz.ratio(command, word) > 75:
-            return True
-    return False
-
-
 class Bot:
-    class State:
-        menu = StateMenu
-        authors = StateAuthors
-        authors2 = StateAuthors2
 
     def __init__(self):
         token = "ff8d21d2ec05262976bb5df59d6d2ef18b71ae7419fda1ad53305cc4f4451d705daf646700927e978156a"
@@ -65,19 +53,13 @@ class Bot:
             self.db.session.add(user)
             self.db.session.commit()
 
-    def change_state(self, user, state_id):
-        if type(user) == int:
-            user = self.db.get_users_by_id(user)
-        user.state = state_id
-        self.db.session.commit()
-
     def new_msg_action(self, event):
         msg = event.obj['message']["text"].strip().lower().split()[-1]
         request = EventInfo(event.obj['message'], event.obj['message']['peer_id'], msg)
         self.create_user_if_not_exists(request.user_id)
         current_user = self.db.get_users_by_id(request.user_id)
         if self.open_menu_commands(request):
-            self.change_state(current_user, 1)
+            self.db.change_user_state(current_user, StateIndex.menu)
         else:
             if not current_user.state_id:
                 return

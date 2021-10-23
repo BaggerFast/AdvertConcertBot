@@ -1,5 +1,5 @@
 from keyboards import Keyboards
-from misc import EventInfo
+from misc import EventInfo, StateIndex
 from states import BaseState
 
 
@@ -30,11 +30,12 @@ class StateMenu(BaseState):
 
     def sintez(self):
         self.bot.send_msg(self.request.user_id, '"SINTEZ" - это музакальное объединение '
-                                              "Владимирских исполнителей...")
+                                                "Владимирских исполнителей...")
 
     def authors(self):
-        self.bot.send_msg(self.request.user_id, f'{self.cashed_authors}\nВведите номер артиста:', keyboard=Keyboards.back)
-        self.bot.change_state(self.request.user_id, 2)
+        self.bot.send_msg(self.request.user_id, f'{self.cashed_authors}\nВведите номер артиста:',
+                          keyboard=Keyboards.back)
+        self.bot.db.change_user_state(self.request.user_id, StateIndex.authors)
 
     def get_authors(self):
         artists_text = ''
@@ -43,5 +44,5 @@ class StateMenu(BaseState):
         return artists_text
 
     def close(self):
-        self.bot.send_msg(self.request.user_id, 'Чтобы снова открыть меню, напишите "Меню"', Keyboards.empty,
-                          True)
+        self.bot.send_msg(self.request.user_id, 'Чтобы снова открыть меню, напишите "Меню"', Keyboards.empty)
+        self.bot.db.change_user_state(self.request.user_id, StateIndex.menu)
