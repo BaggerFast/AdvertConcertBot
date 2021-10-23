@@ -21,15 +21,24 @@ class Database:
         photo = Column(String(250), nullable=False)
         music = relationship("Tracks")
 
-        def __repr__(self):
-            print(self.name)
+    class Users(Base):
+        __tablename__ = 'Users'
+        id = Column(Integer, primary_key=True)
+        vk_id = Column(Integer, nullable=False)
+        state_id = Column(Integer, default=0, nullable=False)
 
     def __init__(self):
         self.engine = create_engine('sqlite:///database.db', echo=True if Settings.debug else False)
         self.session = sessionmaker(bind=self.engine)()
 
-    def __create(self):
+    def create(self):
         self.Base.metadata.create_all(self.engine)
+
+    def get_users_by_id(self, user_id):
+        try:
+            return self.session.query(self.Users).filter(self.Users.vk_id == user_id).one()
+        except exc.NoResultFound:
+            return False
 
     def get_authors(self):
         return self.session.query(self.Author).all()
@@ -42,5 +51,5 @@ class Database:
 
 
 if __name__ == "__main__":
-    # use when we need use database
-    pass
+    a = Database()
+    a.create()
