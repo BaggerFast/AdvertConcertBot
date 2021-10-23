@@ -33,16 +33,15 @@ class StateMenu(BaseState):
                                                 "Владимирских исполнителей...")
 
     def authors(self):
-        self.bot.send_msg(self.request.user_id, f'{self.cashed_authors}\nВведите номер артиста:',
-                          keyboard=Keyboards.back)
-        self.bot.db.change_user_state(self.request.user_id, StateIndex.authors)
+        self.bot.send_msg(self.request.user_id, f'{self.cashed_authors}\nВведите номер артиста:', Keyboards.back)
+        self.db.change_user_state(self.request.user_id, StateIndex.authors)
 
     def get_authors(self):
         artists_text = ''
-        for i, artist in enumerate(self.bot.db.get_authors()):
+        for i, artist in enumerate(self.db.get_authors):
             artists_text += f'{i + 1}. {artist.name}\n'
         return artists_text
 
     def close(self):
         self.bot.send_msg(self.request.user_id, 'Чтобы снова открыть меню, напишите "Меню"', Keyboards.empty)
-        self.bot.db.change_user_state(self.request.user_id, StateIndex.menu)
+        self.db.change_user_state(self.request.user_id, StateIndex.menu)

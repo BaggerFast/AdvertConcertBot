@@ -1,4 +1,6 @@
 import dataclasses
+from abc import ABC
+from typing import Union
 from fuzzywuzzy import fuzz
 
 
@@ -9,19 +11,19 @@ class EventInfo:
     command: str
 
 
-class Settings:
-    debug = True
-    words_coef = 75
+class Settings(ABC):
+    debug: bool = True
+    words_coef: int = 75
 
 
-class StateIndex:
-    default = 0
-    menu = 1
-    authors = 2
-    authors2 = 3
+class StateIndex(ABC):
+    default: int = 0
+    menu: int = 1
+    authors: int = 2
+    state_manager: int = 3
 
 
-def words_compare(command, words):
+def words_compare(command: str, words: Union[list, tuple]) -> bool:
     for word in words:
         if fuzz.ratio(command, word) >= Settings.words_coef:
             return True

@@ -8,7 +8,6 @@ from vk_api.utils import get_random_id
 from database import Database
 from keyboards import Keyboards
 from misc import EventInfo, Settings, StateIndex, words_compare
-from states import BaseState
 from states import StatesManager
 
 
@@ -17,7 +16,7 @@ class Bot:
     def __init__(self):
         token = "ff8d21d2ec05262976bb5df59d6d2ef18b71ae7419fda1ad53305cc4f4451d705daf646700927e978156a"
         group_id = 80176390
-        self.__state: BaseState = None
+        self.__state = None
         self.vk = vk_api.VkApi(token=token)
         self.longpoll = VkBotLongPoll(self.vk, group_id)
         self.db = Database()
@@ -44,19 +43,13 @@ class Bot:
             raise BaseException
 
     def group_join_action(self, event):
-        self.create_user_if_not_exists(event.obj.user_id)
+        self.db.create_user_if_not_exists(event.obj.user_id)
         self.send_msg(event.obj.user_id, 'ГС\nЧтобы узнать больше, напиши "Меню"', Keyboards.empty)
-
-    def create_user_if_not_exists(self, vk_id):
-        if not self.db.get_users_by_id(vk_id):
-            user = Database.Users(vk_id=vk_id, state_id=0)
-            self.db.session.add(user)
-            self.db.session.commit()
 
     def new_msg_action(self, event):
         msg = event.obj['message']["text"].strip().lower().split()[-1]
         request = EventInfo(event.obj['message'], event.obj['message']['peer_id'], msg)
-        self.create_user_if_not_exists(request.user_id)
+        self.db.create_user_if_not_exists(request.user_id)
         current_user = self.db.get_users_by_id(request.user_id)
         if self.open_menu_commands(request):
             self.db.change_user_state(current_user, StateIndex.menu)
@@ -77,18 +70,15 @@ class Bot:
             return False
         return True
 
-    def send_msg(self, user_id, msg, keyboard: vk_api.keyboard = None, attachment: Union[str, list] = None) -> None:
+    def send_msg(self, user_id: int, msg: str, kb: vk_api.keyboard = None, attachment: Union[str, list] = None) -> None:
         method_info = {
             'user_id': user_id,
             'message': msg,
             'random_id': get_random_id(),
+            'keyboard': kb.get_keyboard() if kb and kb != Keyboards.empty else kb,
         }
-        if keyboard and keyboard != Keyboards.empty:
-            method_info['keyboard'] = keyboard.get_keyboard()
-        else:
-            method_info['keyboard'] = keyboard
 
         if attachment:
-            method_info['attachment'] = attachment if type(attachment) != list else ','.join(attachment)
+            method_info['attachment'] = ','.join(attachment) if isinstance(attachment, list) else attachment
 
         self.vk.method('messages.send', method_info)

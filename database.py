@@ -1,15 +1,14 @@
 from typing import Union
-
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-
 from misc import Settings
 
 
 class Database:
     Base = declarative_base()
 
+    # tables
     class Tracks(Base):
         __tablename__ = 'Tracks'
         id = Column(Integer, primary_key=True)
@@ -43,28 +42,55 @@ class Database:
     def create(self):
         self.Base.metadata.create_all(self.engine)
 
+    # get
+    @property
+    def get_authors(self):
+        return self.session.query(self.Author).order_by(self.Author.id)
+
+    def get_authors_by_id(self, key: int):
+        try:
+            return self.session.query(self.Author).filter(self.Author.id == key).one()
+        except exc.NoResultFound:
+            return False
+
+    def get_users_by_id(self, key: int):
+        try:
+            return self.session.query(self.Users).filter(self.Users.vk_id == key).one()
+        except exc.NoResultFound:
+            return False
+
+    def get_user_selected_author(self, user: Union[int, Users]):
+        user = self.get_users_by_id(user)
+        return user.selected_author.author_id
+
+    # create
+    def create_user_if_not_exists(self, key):
+        if not self.get_users_by_id(key):
+            user = self.Users(vk_id=key, state_id=0)
+            self.session.add(user)
+            self.session.commit()
+
     def change_user_state(self, user: Union[int, Users], state_id):
         if isinstance(user, int):
             user = self.get_users_by_id(user)
         user.state_id = state_id
         self.session.commit()
 
-    def get_users_by_id(self, user_id):
-        try:
-            return self.session.query(self.Users).filter(self.Users.vk_id == user_id).one()
-        except exc.NoResultFound:
-            return False
-
-    def get_authors(self):
-        return self.session.query(self.Author).order_by(self.Author.id)
-
-    def get_authors_by_id(self, key):
-        try:
-            return self.session.query(self.Author).filter(self.Author.id == key).one()
-        except exc.NoResultFound:
-            return False
+    def set_user_selected_author(self, user: Union[int, Users], selected: int):
+        user = self.get_users_by_id(user)
+        if user.selected_author:
+            user.selected_author.author_id = selected
+            self.session.add(user)
+            self.session.commit()
+        else:
+            selected = self.SelectedAuthor(user_id=user.id, author_id=selected)
+            self.session.add(selected)
+            self.session.commit()
 
 
 if __name__ == "__main__":
+    """
+    Использовать только для изменения бд
+    """
     a = Database()
     a.create()
