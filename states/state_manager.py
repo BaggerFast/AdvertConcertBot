@@ -1,4 +1,4 @@
-from misc import StateIndex
+from misc.addition import StateIndex
 from states import StateMenu, StateAuthors, StateAuthors2
 
 

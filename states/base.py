@@ -1,6 +1,5 @@
 from abc import ABC
-from database import Database
-from misc import EventInfo
+from misc import Database, EventInfo
 
 
 class BaseState(ABC):

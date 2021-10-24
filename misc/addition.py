@@ -1,4 +1,5 @@
 import dataclasses
+import os
 from abc import ABC
 from typing import Union
 from fuzzywuzzy import fuzz
@@ -12,7 +13,7 @@ class EventInfo:
 
 
 class Settings(ABC):
-    debug: bool = True
+    debug: bool = False
     words_coef: int = 75
 
 
@@ -29,3 +30,9 @@ def words_compare(command: str, words: Union[list, tuple]) -> bool:
             return True
     return False
 
+
+ROOT_DIR = os.path.dirname(os.path.abspath('run.py'))
+
+
+def get_path(path: str) -> str:
+    return os.path.join(*[ROOT_DIR] + path.lower().replace('\\', '/').split('/'))
