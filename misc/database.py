@@ -39,7 +39,7 @@ class Database:
         self.engine = create_engine('sqlite:///database.db', echo=True if Settings.debug else False)
         self.session = sessionmaker(bind=self.engine)()
 
-    def __create(self):
+    def create(self):
         self.__Base.metadata.create_all(self.engine)
 
     # get
@@ -89,10 +89,3 @@ class Database:
             selected = self.SelectedAuthor(user_id=user.id, author_id=selected)
             self.session.add(selected)
         self.session.commit()
-
-
-if __name__ == "__main__":
-    """
-    Использовать только для изменения бд
-    """
-    a = Database()
