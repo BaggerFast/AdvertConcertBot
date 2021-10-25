@@ -15,6 +15,8 @@ class EventInfo:
 class Settings(ABC):
     debug: bool = False
     words_coef: int = 75
+    token: str = str(os.environ.get('VK_TOKEN', 'define me!'))
+    group_id: int = int(os.environ.get('VK_ID', 'define me!'))
 
 
 class StateIndex(ABC):

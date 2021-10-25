@@ -13,10 +13,9 @@ from misc import Keyboards, Database, EventInfo, Settings, StateIndex, words_com
 class Bot:
 
     def __init__(self):
-        token = "8136930003d60a88ebe84efb1d3f74aa778df9a14117610ce4a3767dfc9597af7fb46f9705547d93ecfc6"
-        self.group_id = 80176390
+        self.group_id = Settings.group_id
         self.__state = None
-        self.vk = vk_api.VkApi(token=token)
+        self.vk = vk_api.VkApi(token=Settings.token)
         self.longpoll = VkBotLongPoll(self.vk, self.group_id)
         self.upload = vk_api.VkUpload(self.vk)
         self.vk_methods = self.vk.get_api()
@@ -75,8 +74,7 @@ class Bot:
     def __open_menu_commands(self, request: EventInfo) -> bool:
         if words_compare(request.command, ("привет", "начать", "start", "здарова", "добрый день", "хай",
                                            "здравствуйте", "ку")):
-            self.send_msg(user_id=request.user_id, msg="Команда SINTEZ приветствует тебя!\n"
-                                                       "В меню ты можешь найти самую важную информацию:",
+            self.send_msg(user_id=request.user_id,
                           kb=Keyboards.menu, attachment=self.get_audio_massage(request, get_path('audio/hello.mp3')))
 
         elif words_compare(request.command, ("menu", "меню")):
@@ -92,7 +90,7 @@ class Bot:
         audio_vk_path = f"doc{audio_info['owner_id']}_{audio_info['id']}"
         return audio_vk_path
 
-    def send_msg(self, user_id: int, msg: str, kb: vk_api.keyboard = None, attachment: Union[str, list] = None) -> None:
+    def send_msg(self, user_id: int, msg: str = ' ', kb: vk_api.keyboard = None, attachment: Union[str, list] = None) -> None:
         method_info = {
             'user_id': user_id,
             'message': msg,
