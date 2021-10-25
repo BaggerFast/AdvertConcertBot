@@ -68,7 +68,8 @@ class Database:
     def create_user_if_not_exists(self, key) -> Users:
         user = self.get_users_by_id(key)
         if not user:
-            self.session.add(self.Users(vk_id=key, state_id=0))
+            user = self.Users(vk_id=key, state_id=0)
+            self.session.add(user)
             self.session.commit()
         return user
 
