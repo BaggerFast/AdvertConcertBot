@@ -24,7 +24,7 @@ class Bot:
         self.db = Database()
 
     def run(self) -> None:
-        print("Bot запущен...")
+        print("Bot started")
         try:
             event_data = {
                 VkBotEventType.GROUP_JOIN: self.__group_join_action,
