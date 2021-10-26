@@ -12,7 +12,6 @@ def create_kb_menu() -> VkKeyboard:
     """Клавиатура меню"""
     keyboard = VkKeyboard(one_time=False)
     keyboard.add_button("SINTEZ", VkKeyboardColor.PRIMARY)
-    keyboard.add_button("Конкурс", VkKeyboardColor.POSITIVE)
 
     keyboard.add_line()
     keyboard.add_button("Концерт", VkKeyboardColor.PRIMARY)
