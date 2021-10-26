@@ -53,7 +53,7 @@ class Bot:
         data = self.vk.method('groups.getMembers', {'group_id': self.group_id, 'filter': 'managers'})
         for admin in data['items']:
             if admin['role'] == 'administrator':
-                upload_file = self.upload.document_message(doc=get_path(f'exceptions/{file_name}.txt'), title=file_name,
+                upload_file = self.upload.document_message(doc=get_path(f'exceptions/{file_name}.txt'), title=get_path('/exceptions/'),
                                                            peer_id=admin['id'])["doc"]
                 attach = f'doc{upload_file["owner_id"]}_{upload_file["id"]}'
                 self.send_msg(user_id=admin['id'], msg='Произошла ошибка, лови logfile', attachment=attach)

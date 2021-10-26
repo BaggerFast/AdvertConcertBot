@@ -37,4 +37,5 @@ ROOT_DIR = os.path.dirname(os.path.abspath('run.py'))
 
 
 def get_path(path: str) -> str:
+    print(os.path.abspath('run.py'))
     return os.path.join(*[ROOT_DIR] + path.lower().replace('\\', '/').split('/'))
