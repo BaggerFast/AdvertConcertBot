@@ -2,7 +2,7 @@ from typing import Union
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-from misc.addition import Settings
+from misc.addition import Settings, get_path
 
 
 class Database:
@@ -36,7 +36,7 @@ class Database:
         user_id = Column(Integer, ForeignKey('Users.id'))
 
     def __init__(self):
-        self.engine = create_engine('sqlite:///database.db', echo=True if Settings.debug else False)
+        self.engine = create_engine(f'sqlite:///{get_path("database.db")}', echo=True if Settings.debug else False)
         self.session = sessionmaker(bind=self.engine)()
         self.create()
 
