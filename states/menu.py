@@ -1,4 +1,4 @@
-from misc import EventInfo, StateIndex, Keyboards
+from misc import EventInfo, StateIndex, Keyboards, get_path
 from states import BaseState
 
 
@@ -25,7 +25,9 @@ class StateMenu(BaseState):
         site = "https://yandex.ru/maps/192/vladimir/house/dvoryanskaya_ulitsa_27ak2/YEkYdQ9pTU0BQFtsfX1zd3RiZA==/?ll=40" \
                ".389486%2C56.126810&source=wizgeo&utm_medium=maps-desktop&utm_source=serp&z=17.08"
         text = "Концерт состоиться 14 ноября в 18:00 \n По адресу Дворянская улица, 27Ак2, Владимир"
+        audio = self.bot.get_audio_massage(self.request, get_path('audio/concert.mp3'))
         self.bot.send_msg(self.request.user_id, f"{site}\n{text}")
+        self.bot.send_msg(self.request.user_id, attachment=audio)
 
     def __sintez(self):
         self.bot.send_msg(self.request.user_id, '"SINTEZ" - это музакальное объединение '

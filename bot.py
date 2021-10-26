@@ -1,5 +1,4 @@
 import os
-
 import vk_api
 import requests
 import traceback
@@ -54,7 +53,7 @@ class Bot:
         for admin in data['items']:
             if admin['role'] == 'administrator':
                 upload_file = self.upload.document_message(doc=get_path(f'exceptions/{file_name}.txt'),
-                                                           title=get_path('/exceptions/'),
+                                                           title=file_name,
                                                            peer_id=admin['id'])["doc"]
                 attach = f'doc{upload_file["owner_id"]}_{upload_file["id"]}'
                 self.send_msg(user_id=admin['id'], msg='Произошла ошибка, лови logfile', attachment=attach)

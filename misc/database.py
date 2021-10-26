@@ -38,7 +38,6 @@ class Database:
     def __init__(self):
         self.engine = create_engine(f'sqlite:///{get_path("database.db")}', echo=True if Settings.debug else False)
         self.session = sessionmaker(bind=self.engine)()
-        self.create()
 
     def create(self):
         self.__Base.metadata.create_all(self.engine)
