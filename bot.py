@@ -60,7 +60,8 @@ class Bot:
 
     def __group_join_action(self, event) -> None:
         self.db.create_user_if_not_exists(event.obj.user_id)
-        self.send_msg(event.obj.user_id, 'ГС\nЧтобы узнать больше, напиши "Меню"', Keyboards.empty)
+        self.send_msg(user_id=event.obj.user_id,
+                      kb=Keyboards.menu, attachment=self.get_audio_massage(event.obj, get_path('audio/hello.mp3')))
 
     def __new_msg_action(self, event) -> None:
         msg = event.obj['message']["text"].strip().lower().split()[-1]
