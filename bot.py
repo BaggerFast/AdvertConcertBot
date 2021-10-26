@@ -1,3 +1,5 @@
+import os
+
 import vk_api
 import requests
 import traceback
@@ -22,7 +24,7 @@ class Bot:
         self.db = Database()
 
     def run(self) -> None:
-        print("Bot is started...")
+        print("Bot запущен...")
         try:
             event_data = {
                 VkBotEventType.GROUP_JOIN: self.__group_join_action,
@@ -30,14 +32,16 @@ class Bot:
             }
             for event in self.longpoll.listen():
                 if event.type in event_data.keys():
-                    event_data[event.type](event)
+                    event_data[event.type](events)
         except Exception:
             self.__logger()
 
     def __logger(self) -> None:
         if not Settings.debug:
+            if not os.path.exists(get_path(f"/exceptions/")):
+                os.mkdir(get_path(f"/exceptions/"))
             name = datetime.now().strftime('%m-%d-%Y-%H-%M-%S')
-            file_path = get_path(f"exceptions/{name}.txt")
+            file_path = get_path(f"/exceptions/{name}.txt")
             with open(file_path, "w") as file:
                 file.write(traceback.format_exc())
             self.__send_log_to_admin(name)
@@ -49,8 +53,8 @@ class Bot:
         data = self.vk.method('groups.getMembers', {'group_id': self.group_id, 'filter': 'managers'})
         for admin in data['items']:
             if admin['role'] == 'administrator':
-                upload_file = self.upload.document_message(doc=get_path(f'exceptions/{file_name}.txt'),
-                                                           title=file_name, peer_id=admin['id'])["doc"]
+                upload_file = self.upload.document_message(doc=get_path(f'exceptions/{file_name}.txt'), title=file_name,
+                                                           peer_id=admin['id'])["doc"]
                 attach = f'doc{upload_file["owner_id"]}_{upload_file["id"]}'
                 self.send_msg(user_id=admin['id'], msg='Произошла ошибка, лови logfile', attachment=attach)
 
