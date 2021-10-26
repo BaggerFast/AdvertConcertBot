@@ -32,7 +32,7 @@ class Bot:
             }
             for event in self.longpoll.listen():
                 if event.type in event_data.keys():
-                    event_data[event.type](events)
+                    event_data[event.type](event)
         except Exception:
             self.__logger()
 
