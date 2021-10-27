@@ -22,16 +22,18 @@ class StateMenu(BaseState):
 
     def __concert(self):
         # ссылка на яндекс карты
-        site = "https://yandex.ru/maps/192/vladimir/house/dvoryanskaya_ulitsa_27ak2/YEkYdQ9pTU0BQFtsfX1zd3RiZA==/?ll=40" \
-               ".389486%2C56.126810&source=wizgeo&utm_medium=maps-desktop&utm_source=serp&z=17.08"
-        text = "Концерт состоиться 14 ноября в 18:00\nПо адресу Дворянская улица, 27Ак2, Владимир"
+        text = "Концерт состоиться 14 ноября в 18:00\nПо адресу Дворянская улица, 27Ак2, Владимир " \
+               "([public206661662|БАР ЦЕХ]) \nЗапуск людей в 17:00\nБИЛЕТЫ ВЛАДИМИР КОНЦЕРТ" \
+               "\nP.S. При себе иметь маску"
+
         audio = self.bot.get_audio_massage(self.request, get_path('audio/concert.mp3'))
-        self.bot.send_msg(self.request.user_id, attachment=audio)
-        self.bot.send_msg(self.request.user_id, f"{site}\n{text}")
+        self.bot.send_msg(self.request.user_id, msg=text, attachment=audio,
+                          pos={'lat': 56.126930, "long": 40.389273})
 
     def __sintez(self):
         audio = self.bot.get_audio_massage(self.request, get_path('audio/sintez.mp3'))
-        self.bot.send_msg(self.request.user_id, attachment=audio)
+        attach = ['photo-207855282_457239126', audio]
+        self.bot.send_msg(self.request.user_id, msg='[public205043643|CООБЩЕСТВО SINTEZ]', attachment=attach)
 
     def __authors(self):
         self.bot.send_msg(self.request.user_id, f'{self.__cashed_authors}\nВведите номер артиста:', Keyboards.back)

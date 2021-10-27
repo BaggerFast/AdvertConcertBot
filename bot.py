@@ -61,7 +61,7 @@ class Bot:
     def __group_join_action(self, event) -> None:
         self.db.create_user_if_not_exists(event.obj.user_id)
         self.send_msg(user_id=event.obj.user_id,
-                      kb=Keyboards.menu, attachment=self.get_audio_massage(event.obj, get_path('audio/hello.mp3')))
+                      kb=Keyboards.menu, msg='Чтобы открыть меню напишите "МЕНЮ"', attachment=self.get_audio_massage(event.obj, get_path('audio/hello.mp3')))
 
     def __new_msg_action(self, event) -> None:
         msg = event.obj['message']["text"].strip().lower().split()[-1]
@@ -79,7 +79,7 @@ class Bot:
     def __open_menu_commands(self, request: EventInfo) -> bool:
         if words_compare(request.command, ("привет", "начать", "start", "здарова", "добрый день", "хай",
                                            "здравствуйте", "ку")):
-            self.send_msg(user_id=request.user_id,
+            self.send_msg(user_id=request.user_id, msg='Чтобы открыть меню напишите "МЕНЮ"',
                           kb=Keyboards.menu, attachment=self.get_audio_massage(request, get_path('audio/hello.mp3')))
 
         elif words_compare(request.command, ("menu", "меню")):
@@ -95,7 +95,8 @@ class Bot:
         audio_vk_path = f"doc{audio_info['owner_id']}_{audio_info['id']}"
         return audio_vk_path
 
-    def send_msg(self, user_id: int, msg: str = ' ', kb: vk_api.keyboard = None, attachment: Union[str, list] = None) -> None:
+    def send_msg(self, user_id: int, msg: str = ' ', kb: vk_api.keyboard = None,
+                 attachment: Union[str, list] = None, pos: dict = None) -> None:
         method_info = {
             'user_id': user_id,
             'message': msg,
@@ -105,5 +106,8 @@ class Bot:
 
         if attachment:
             method_info['attachment'] = ','.join(attachment) if isinstance(attachment, list) else attachment
+
+        if pos:
+            method_info.update(pos)
 
         self.vk.method('messages.send', method_info)
