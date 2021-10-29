@@ -1,5 +1,5 @@
-from misc import StateIndex, Keyboards
 from states import BaseState
+from misc import StateIndex, Keyboards
 
 
 class StateAuthors(BaseState):

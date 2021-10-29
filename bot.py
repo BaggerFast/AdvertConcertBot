@@ -3,10 +3,12 @@ import vk_api
 import requests
 import traceback
 from typing import Union
+from socket import timeout
 from datetime import datetime
 from states import StatesManager
 from vk_api.keyboard import VkKeyboard
 from vk_api.utils import get_random_id
+from urllib3.exceptions import ReadTimeoutError
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from misc import Keyboards, Database, EventInfo, Settings, StateIndex, words_compare, get_path
 
@@ -24,44 +26,44 @@ class Bot:
 
     def run(self) -> None:
         print("Bot started")
+        event_data = {
+            VkBotEventType.GROUP_JOIN: self.__group_join_action,
+            VkBotEventType.MESSAGE_NEW: self.__new_msg_action,
+        }
         try:
-            event_data = {
-                VkBotEventType.GROUP_JOIN: self.__group_join_action,
-                VkBotEventType.MESSAGE_NEW: self.__new_msg_action,
-            }
             for event in self.longpoll.listen():
                 if event.type in event_data.keys():
                     event_data[event.type](event)
-        except Exception:
-            self.__logger()
+        except Exception and not (requests.exceptions.ReadTimeout, timeout, ReadTimeoutError):
+            if not Settings.debug:
+                self.__write_log_file()
+            else:
+                raise BaseException
 
-    def __logger(self) -> None:
-        if not Settings.debug:
-            if not os.path.exists(get_path(f"/exceptions/")):
-                os.mkdir(get_path(f"/exceptions/"))
-            name = datetime.now().strftime('%m-%d-%Y-%H-%M-%S')
-            file_path = get_path(f"/exceptions/{name}.txt")
-            with open(file_path, "w") as file:
-                file.write(traceback.format_exc())
-            self.__send_log_to_admin(name)
-            self.run()
-        else:
-            raise BaseException
+    def __write_log_file(self) -> None:
+        name = datetime.now().strftime('%m-%d-%Y-%H-%M-%S')
+        exception_path = get_path(f"exceptions")
+        if not os.path.exists(exception_path):
+            os.mkdir(exception_path)
+        file_path = get_path(f"{exception_path}{name}.txt")
+        with open(file_path, "w") as file:
+            file.write(traceback.format_exc())
+        self.__send_log_to_admin(name, file_path)
+        self.run()
 
-    def __send_log_to_admin(self, file_name: str) -> None:
-        data = self.vk.method('groups.getMembers', {'group_id': self.group_id, 'filter': 'managers'})
-        for admin in data['items']:
-            if admin['role'] == 'administrator':
-                upload_file = self.upload.document_message(doc=get_path(f'exceptions/{file_name}.txt'),
-                                                           title=file_name,
-                                                           peer_id=admin['id'])["doc"]
+    def __send_log_to_admin(self, file_name: str, file_path: str) -> None:
+        users = self.vk.method('groups.getMembers', {'group_id': self.group_id, 'filter': 'managers'})
+        for user in users['items']:
+            if user['role'] == 'administrator':
+                upload_file = self.upload.document_message(doc=file_path,  title=file_name, peer_id=user['id'])["doc"]
                 attach = f'doc{upload_file["owner_id"]}_{upload_file["id"]}'
-                self.send_msg(user_id=admin['id'], msg='Произошла ошибка, лови logfile', attachment=attach)
+                self.send_msg(user_id=user['id'], msg='Произошла ошибка, лови logfile', attachment=attach)
 
     def __group_join_action(self, event) -> None:
         self.db.create_user_if_not_exists(event.obj.user_id)
         self.send_msg(user_id=event.obj.user_id,
-                      kb=Keyboards.menu, msg='Чтобы открыть меню напишите "МЕНЮ"', attachment=self.get_audio_massage(event.obj, get_path('audio/hello.mp3')))
+                      kb=Keyboards.menu, msg='Чтобы открыть меню напишите "МЕНЮ"',
+                      attachment=self.get_audio_massage(event.obj, get_path('audio/hello.mp3')))
 
     def __new_msg_action(self, event) -> None:
         msg = event.obj['message']["text"].strip().lower().split()[-1]

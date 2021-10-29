@@ -1,8 +1,8 @@
 from typing import Union
-from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, exc
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
 from misc.addition import Settings, get_path
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, exc
 
 
 class Database:
@@ -44,7 +44,7 @@ class Database:
 
     # get
     @property
-    def get_authors(self):
+    def get_authors(self) -> list[Users]:
         return list(self.session.query(self.Author).order_by(self.Author.id))
 
     def get_authors_by_id(self, key: int):
@@ -74,13 +74,13 @@ class Database:
         return user
 
     # set
-    def set_user_state(self, user: Union[int, Users], state_id):
+    def set_user_state(self, user: Union[int, Users], state_id) -> None:
         if isinstance(user, int):
             user = self.get_users_by_id(user)
         user.state_id = state_id
         self.session.commit()
 
-    def set_user_selected_author(self, user: Union[int, Users], selected: int):
+    def set_user_selected_author(self, user: Union[int, Users], selected: int) -> None:
         if isinstance(user, int):
             user = self.get_users_by_id(user)
         if user.selected_author:

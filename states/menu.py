@@ -1,5 +1,5 @@
-from misc import EventInfo, StateIndex, Keyboards, get_path
 from states import BaseState
+from misc import EventInfo, StateIndex, Keyboards, get_path
 
 
 class StateMenu(BaseState):
@@ -21,11 +21,9 @@ class StateMenu(BaseState):
         return True
 
     def __concert(self):
-        # ссылка на яндекс карты
         text = "Концерт состоиться 14 ноября в 18:00\nПо адресу Дворянская улица, 27Ак2, Владимир " \
                "([public206661662|БАР ЦЕХ]) \nЗапуск людей в 17:00\nБИЛЕТЫ ВЛАДИМИР КОНЦЕРТ" \
                "\nP.S. При себе иметь маску"
-
         audio = self.bot.get_audio_massage(self.request, get_path('audio/concert.mp3'))
         self.bot.send_msg(self.request.user_id, msg=text, attachment=audio,
                           pos={'lat': 56.126930, "long": 40.389273})
