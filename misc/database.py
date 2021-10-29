@@ -37,7 +37,6 @@ class Database:
 
     def __init__(self):
         self.engine = create_engine(f'sqlite:///{get_path("database.db")}', echo=True if Settings.debug else False)
-        self.create()
         self.session = sessionmaker(bind=self.engine)()
 
     def create(self):
