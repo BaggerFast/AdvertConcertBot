@@ -44,8 +44,8 @@ class Database:
 
     # get
     @property
-    def get_authors(self) -> list[Users]:
-        pass
+    def get_authors(self):
+        return [1, 2, 3, 44]
 
     def get_authors_by_id(self, key: int):
         try:
