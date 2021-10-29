@@ -37,8 +37,7 @@ class Bot:
         except Exception and not (requests.exceptions.ReadTimeout, timeout, ReadTimeoutError):
             if not Settings.debug:
                 self.__write_log_file()
-            else:
-                raise BaseException
+            self.run()
 
     def __write_log_file(self) -> None:
         name = datetime.now().strftime('%m-%d-%Y-%H-%M-%S')
@@ -49,7 +48,6 @@ class Bot:
         with open(file_path, "w") as file:
             file.write(traceback.format_exc())
         self.__send_log_to_admin(name, file_path)
-        self.run()
 
     def __send_log_to_admin(self, file_name: str, file_path: str) -> None:
         users = self.vk.method('groups.getMembers', {'group_id': self.group_id, 'filter': 'managers'})
