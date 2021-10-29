@@ -36,8 +36,8 @@ class Database:
         user_id = Column(Integer, ForeignKey('Users.id'))
 
     def __init__(self):
-        self.create()
         self.engine = create_engine(f'sqlite:///{get_path("database.db")}', echo=True if Settings.debug else False)
+        self.create()
         self.session = sessionmaker(bind=self.engine)()
 
     def create(self):
