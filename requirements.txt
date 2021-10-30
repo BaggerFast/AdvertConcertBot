@@ -1,6 +1,6 @@
 vk_api==11.9.4
 sqlalchemy==1.4.25
-fuzzywuzzy==0.18.0
-python-Levenshtein==0.12.2
-requests==2.26.0
 dataclasses==0.6
+python-Levenshtein
+fuzzywuzzy==0.18.0
+requests==2.26.0

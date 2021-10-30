@@ -3,12 +3,10 @@ import vk_api
 import requests
 import traceback
 from typing import Union
-from socket import timeout
 from datetime import datetime
 from states import StatesManager
 from vk_api.keyboard import VkKeyboard
 from vk_api.utils import get_random_id
-from urllib3.exceptions import ReadTimeoutError
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from misc import Keyboards, Database, EventInfo, Settings, StateIndex, words_compare, get_path
 

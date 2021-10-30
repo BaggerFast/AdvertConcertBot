@@ -136,7 +136,7 @@ modules.xml
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
-__pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 
@@ -297,9 +297,5 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
-# Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,windows,linux,macos
-
-!.gitkeep
