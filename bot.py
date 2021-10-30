@@ -15,11 +15,9 @@ class Bot:
 
     def __init__(self):
         self.group_id = Settings.group_id
-        self.__state = None
         self.vk = vk_api.VkApi(token=Settings.token)
         self.longpoll = VkBotLongPoll(self.vk, self.group_id)
         self.upload = vk_api.VkUpload(self.vk)
-        self.vk_methods = self.vk.get_api()
         self.db = Database()
 
     def run(self) -> None:
