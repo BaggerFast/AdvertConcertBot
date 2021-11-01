@@ -1,5 +1,5 @@
 from typing import Union
-from misc.addition import Settings, get_path
+from misc.addition import get_path
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, exc
@@ -36,7 +36,7 @@ class Database:
         user_id = Column(Integer, ForeignKey('Users.id'))
 
     def __init__(self):
-        self.engine = create_engine(f'sqlite:///{get_path("database.db")}', echo=True if Settings.debug else False)
+        self.engine = create_engine(f'sqlite:///{get_path("database.db")}', echo=False)
         self.session = sessionmaker(bind=self.engine)()
 
     def create(self):

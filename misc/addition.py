@@ -38,4 +38,4 @@ def get_path(path: str) -> str:
     if Settings.debug:
         return os.path.join(*[ROOT_DIR] + path.lower().replace('\\', '/').split('/'))
     else:
-        return os.path.join(*'home/vk_bot/'.replace('\\', '/').split('/') + path.lower().replace('\\', '/').split('/'))
+        return os.path.join(*'home/vk_bot/'.split('/') + path.lower().replace('\\', '/').split('/'))
