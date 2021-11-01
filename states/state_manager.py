@@ -13,4 +13,3 @@ class StatesManager:
     @staticmethod
     def get_state(index: int):
         return StatesManager.states[index] if index in StatesManager.states.keys() else StatesManager.states[0]
-

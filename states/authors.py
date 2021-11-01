@@ -1,5 +1,5 @@
-from misc import StateIndex, Keyboards
 from states import BaseState
+from misc import StateIndex, Keyboards
 
 
 class StateAuthors(BaseState):
@@ -39,6 +39,14 @@ class StateAuthors(BaseState):
 
 class StateAuthors2(StateAuthors):
 
+    def __init__(self, bot, request):
+        super().__init__(bot, request)
+        self.__messages = {
+            'следующий': lambda: self.switch_author(self.db.get_user_selected_author(self.request.user_id)+1),
+            'предыдущий': lambda: self.switch_author(self.db.get_user_selected_author(self.request.user_id)-1),
+            'назад': self.go_menu,
+        }
+
     def switch_author(self, number):
         number = number % len(self.db.get_authors)
         author = self.db.get_authors_by_id(number)
@@ -46,12 +54,8 @@ class StateAuthors2(StateAuthors):
             self.show_author(author, number)
 
     def run(self):
-        if self.request.command == 'следующий':
-            self.switch_author(self.db.get_user_selected_author(self.request.user_id)+1)
-        elif self.request.command == 'предыдущий':
-            self.switch_author(self.db.get_user_selected_author(self.request.user_id)-1)
-        elif self.request.command == 'назад':
-            self.go_menu()
+        if self.request.command in self.__messages.keys():
+            self.__messages[self.request.command]()
         else:
             self.set_error()
         return True

@@ -297,10 +297,7 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
-# Windows shortcuts
 *.lnk
-
-# End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,windows,linux,macos
 
 !.gitkeep
 database.db

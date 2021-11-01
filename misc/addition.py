@@ -1,5 +1,5 @@
-import dataclasses
 import os
+import dataclasses
 from abc import ABC
 from typing import Union
 from fuzzywuzzy import fuzz
@@ -33,11 +33,9 @@ def words_compare(command: str, words: Union[list, tuple]) -> bool:
     return False
 
 
-ROOT_DIR = os.path.dirname(os.path.abspath('run.py'))
-
-
 def get_path(path: str) -> str:
+    ROOT_DIR: str = os.path.dirname(os.path.abspath('run.py'))
     if Settings.debug:
         return os.path.join(*[ROOT_DIR] + path.lower().replace('\\', '/').split('/'))
     else:
-        return os.path.join(*'home/vk_bot/'.replace('\\', '/').split('/') + path.lower().replace('\\', '/').split('/'))
+        return os.path.join(*'home/vk_bot/'.split('/') + path.lower().replace('\\', '/').split('/'))
