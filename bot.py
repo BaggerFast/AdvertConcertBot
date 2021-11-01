@@ -26,26 +26,11 @@ class Bot:
             VkBotEventType.GROUP_JOIN: self.__group_join_action,
             VkBotEventType.MESSAGE_NEW: self.__new_msg_action,
         }
-        try:
-            for event in self.longpoll.listen():
-                if event.type in event_data.keys():
-                    event_data[event.type](event)
-        except Exception:
-            if not Settings.debug:
-                self.__write_log_file()
-            self.run()
+        for event in self.longpoll.listen():
+            if event.type in event_data.keys():
+                event_data[event.type](event)
 
-    def __write_log_file(self) -> None:
-        name = datetime.now().strftime('%m-%d-%Y-%H-%M-%S')
-        exception_path = get_path(f"exceptions")
-        if not os.path.exists(exception_path):
-            os.mkdir(exception_path)
-        file_path = f"{exception_path}/{name}.txt"
-        with open(file_path, "w") as file:
-            file.write(traceback.format_exc())
-        self.__send_log_to_admin(name, file_path)
-
-    def __send_log_to_admin(self, file_name: str, file_path: str) -> None:
+    def send_log_to_admin(self, file_name: str, file_path: str) -> None:
         users = self.vk.method('groups.getMembers', {'group_id': self.group_id, 'filter': 'managers'})
         for user in users['items']:
             if user['role'] == 'administrator':
