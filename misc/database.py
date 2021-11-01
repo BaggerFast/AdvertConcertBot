@@ -43,7 +43,6 @@ class Database:
         self.__Base.metadata.create_all(self.engine)
 
     # get
-    @property
     def get_authors(self) -> list[Users]:
         return list(self.session.query(self.Author).order_by(self.Author.id))
 
