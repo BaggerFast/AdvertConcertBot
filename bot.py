@@ -1,11 +1,13 @@
 import vk_api
 import requests
 from typing import Union
+
+from misc.database import Database
 from states import StatesManager
 from vk_api.keyboard import VkKeyboard
 from vk_api.utils import get_random_id
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from misc import Keyboards, Database, EventInfo, Settings, StateIndex, words_compare, get_path
+from misc import Keyboards, EventInfo, Settings, StateIndex, words_compare, get_path
 
 
 class Bot:
