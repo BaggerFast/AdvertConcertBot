@@ -1,3 +1,5 @@
+import vk_api
+
 from states import BaseState
 from misc import EventInfo
 
@@ -25,7 +27,10 @@ https://www.vladimirkoncert.ru/
 Или приобретай их на прямую у организатора!"""
 
         for user_id in all_members:
-            self.bot.send_msg(user_id=user_id, msg=text)
+            try:
+                self.bot.send_msg(user_id=user_id, msg=text)
+            except vk_api.exceptions.ApiError:
+                continue
 
     def run(self) -> bool:
         all_members = self.bot.vk.method('groups.getMembers', {'group_id': self.bot.group_id, 'filter': 'managers'})

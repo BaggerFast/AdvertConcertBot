@@ -31,11 +31,14 @@ class Bot:
         all_members = self.vk.method('groups.getMembers', {'group_id': self.group_id, 'filter': 'managers'})
         for user in all_members['items']:
             if user['role'] == 'administrator':
-                upload_file = self.upload.document_message(doc=file_path,
-                                                           title=file_name,
-                                                           peer_id=user['id'])["doc"]
-                attach = f'doc{upload_file["owner_id"]}_{upload_file["id"]}'
-                self.send_msg(user_id=user['id'], msg='Произошла ошибка, лови logfile', attachment=attach)
+                try:
+                    upload_file = self.upload.document_message(doc=file_path,
+                                                               title=file_name,
+                                                               peer_id=user['id'])["doc"]
+                    attach = f'doc{upload_file["owner_id"]}_{upload_file["id"]}'
+                    self.send_msg(user_id=user['id'], msg='Произошла ошибка, лови logfile', attachment=attach)
+                except vk_api.exceptions.ApiError:
+                    continue
 
     def __group_join_action(self, event) -> None:
         self.db.create_user_if_not_exists(event.obj.user_id)
