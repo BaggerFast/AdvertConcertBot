@@ -10,11 +10,12 @@ def main():
     try:
         bot.run()
     except Exception:
-        if not Settings.debug:
+        print(Settings.debug, type(Settings.debug))
+        if Settings.debug:
+            print(traceback.format_exc())
+        else:
             write_log_file(bot)
             main()
-        else:
-            print(traceback.format_exc())
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ class EventInfo:
 
 
 class Settings(ABC):
-    debug: bool = bool(os.environ.get('DEBUG', 0))
+    debug: bool = bool(int(os.environ.get('DEBUG', 0)))
     words_coef: int = 75
     token: str = str(os.environ.get('VK_TOKEN', 'define me!'))
     group_id: int = int(os.environ.get('VK_ID', 'define me!'))
