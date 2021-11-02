@@ -1,6 +1,8 @@
 import os
 import dataclasses
+import traceback
 from abc import ABC
+from datetime import datetime
 from typing import Union
 from fuzzywuzzy import fuzz
 
@@ -39,3 +41,15 @@ def get_path(path: str) -> str:
         return os.path.join(*[ROOT_DIR] + path.lower().replace('\\', '/').split('/'))
     else:
         return os.path.join(*'home/vk_bot/'.split('/') + path.lower().replace('\\', '/').split('/'))
+
+
+def write_log_file(bot) -> None:
+    name = datetime.now().strftime('%m-%d-%Y-%H-%M-%S')
+    exception_path = get_path(f"exceptions")
+    if not os.path.exists(exception_path):
+        os.mkdir(exception_path)
+    file_path = f"{exception_path}/{name}.txt"
+    with open(file_path, "w", encoding='utf-8') as file:
+        file.write(traceback.format_exc())
+    bot.send_log_to_admin(name, file_path)
+

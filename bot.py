@@ -1,7 +1,7 @@
 import vk_api
 import requests
 from typing import Union
-from states import StatesManager
+from states import StatesManager, AdminCommands
 from vk_api.keyboard import VkKeyboard
 from vk_api.utils import get_random_id
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
@@ -28,14 +28,14 @@ class Bot:
                 event_data[event.type](event)
 
     def send_log_to_admin(self, file_name: str, file_path: str) -> None:
-        data = self.vk.method('groups.getMembers', {'group_id': self.group_id, 'filter': 'managers'})
-        for admin in data['items']:
-            if admin['role'] == 'administrator':
+        all_members = self.vk.method('groups.getMembers', {'group_id': self.group_id, 'filter': 'managers'})
+        for user in all_members['items']:
+            if user['role'] == 'administrator':
                 upload_file = self.upload.document_message(doc=file_path,
                                                            title=file_name,
-                                                           peer_id=admin['id'])["doc"]
+                                                           peer_id=user['id'])["doc"]
                 attach = f'doc{upload_file["owner_id"]}_{upload_file["id"]}'
-                self.send_msg(user_id=admin['id'], msg='Произошла ошибка, лови logfile', attachment=attach)
+                self.send_msg(user_id=user['id'], msg='Произошла ошибка, лови logfile', attachment=attach)
 
     def __group_join_action(self, event) -> None:
         self.db.create_user_if_not_exists(event.obj.user_id)
@@ -49,11 +49,14 @@ class Bot:
         if self.__open_menu_commands(request):
             self.db.set_user_state(current_user, StateIndex.menu)
         else:
-            if not current_user.state_id:
-                return
-            state = StatesManager.get_state(current_user.state_id)(self, request)
-            if not state.run():
-                self.send_msg(request.user_id, 'Неизвестная ошибка, напишите "Меню"')
+            admin_cmd = AdminCommands(self, request)
+            if not admin_cmd.run():
+                if not current_user.state_id:
+                    return
+                state = StatesManager.get_state(current_user.state_id)(self, request)
+
+                if not state.run():
+                    self.send_msg(request.user_id, 'Неизвестная ошибка, напишите "Меню"')
 
     def __open_menu_commands(self, request: EventInfo) -> bool:
         if words_compare(request.command, ("привет", "начать", "start", "здарова", "добрый день", "хай",

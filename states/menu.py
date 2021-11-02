@@ -20,24 +20,41 @@ class StateMenu(BaseState):
             return False
         return True
 
-    def __concert(self):
-        text = "Концерт состоиться 14 ноября в 18:00\nПо адресу Дворянская улица, 27Ак2, Владимир " \
-               "([public206661662|БАР ЦЕХ]) \nЗапуск людей в 17:00\nБИЛЕТЫ ВЛАДИМИР КОНЦЕРТ" \
-               "\nP.S. При себе иметь маску"
+    def __concert(self) -> None:
+        text = """Концерт «VOL ONE» 14.11.21
+        
+Запуск 17:00 Начало 18:00
+[public206661662|Концертный бар ЦЕХ]
+Адрес: Дворянская улица 27А к2
+
+Цена: 200р
+Билеты можно купить здесь:
+https://www.vladimirkoncert.ru/
+
+P.S. При себе иметь маску"""
+
         audio = self.bot.get_audio_massage(self.request, get_path('audio/concert.mp3'))
-        self.bot.send_msg(self.request.user_id, msg=text, attachment=audio,
-                          pos={'lat': 56.126930, "long": 40.389273})
+        self.bot.send_msg(self.request.user_id, attachment=audio)
+        self.bot.send_msg(self.request.user_id, msg=text, pos={'lat': 56.126930, "long": 40.389273})
 
-    def __sintez(self):
+    def __sintez(self) -> None:
         audio = self.bot.get_audio_massage(self.request, get_path('audio/sintez.mp3'))
-        attach = ['photo-207855282_457239126', audio]
-        self.bot.send_msg(self.request.user_id, msg='[public205043643|CООБЩЕСТВО SINTEZ]', attachment=attach)
+        text = """Привет, мы [public205043643|SINTEZ]!
 
-    def __authors(self):
+Объединение людей с разнообразным стилем и жанром.
+Все мы любим свое дело и имеем одну цель - создать что-то по-настоящему новое и уникальное.
+
+Но мы бы не были нами, если бы не ваша поддержка! 
+Мы будем продолжать радовать вас новыми релизами и мероприятиями, а вам лишь остается следить за нами)"""
+
+        attach = ['photo-207855282_457239229', audio]
+        self.bot.send_msg(self.request.user_id, msg=text, attachment=attach)
+
+    def __authors(self) -> None:
         self.bot.send_msg(self.request.user_id, f'{self.__cashed_authors}\nВведите номер артиста:', Keyboards.back)
         self.db.set_user_state(self.request.user_id, StateIndex.authors)
 
-    def __get_authors(self):
+    def __get_authors(self) -> str:
         artists_text = ''
         for i, artist in enumerate(self.db.get_authors):
             artists_text += f'{i + 1}. {artist.name}\n'
