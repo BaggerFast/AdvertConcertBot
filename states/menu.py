@@ -27,9 +27,9 @@ class StateMenu(BaseState):
 [public206661662|Концертный бар ЦЕХ]
 Адрес: Дворянская улица 27А к2
 
-Цена: 200р
+Цена: 250р
 Билеты можно купить здесь:
-https://www.vladimirkoncert.ru/
+https://vladimirkoncert.ru/shows/1172-KONTSERT-VOL-ONE
 
 P.S. При себе иметь маску"""
 

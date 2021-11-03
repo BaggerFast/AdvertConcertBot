@@ -10,9 +10,8 @@ def main():
     try:
         bot.run()
     except Exception:
-        print(Settings.debug, type(Settings.debug))
         if Settings.debug:
-            print(traceback.format_exc())
+            traceback.print_exc()
         else:
             write_log_file(bot)
             main()

@@ -23,7 +23,7 @@ class AdminCommands(BaseState):
 
 Пссс
 Билеты уже доступны здесь:
-https://www.vladimirkoncert.ru/
+https://vladimirkoncert.ru/shows/1172-KONTSERT-VOL-ONE
 Или приобретай их на прямую у организатора!"""
 
         for user_id in all_members:
