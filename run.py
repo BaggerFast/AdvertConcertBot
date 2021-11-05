@@ -14,7 +14,11 @@ def main():
         if Settings.debug:
             traceback.print_exc()
         else:
-            if sys.exc_info()[1] != "[901] Can't send messages for users without permission":
+            useless_exceptions = [
+                'The read operation timed out',
+                "[901] Can't send messages for users without permission"
+            ]
+            if sys.exc_info()[1] not in useless_exceptions:
                 write_log_file(bot, error)
             main()
 

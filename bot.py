@@ -16,9 +16,6 @@ class Bot:
         self.longpoll = VkBotLongPoll(self.vk, self.group_id)
         self.upload = vk_api.VkUpload(self.vk)
         self.db = Database()
-        user = self.db.get_authors_by_id(14)
-        user.photo = 'photo-207855282_457239246'
-        self.db.session.commit()
 
     def run(self) -> None:
         print("Bot started")
