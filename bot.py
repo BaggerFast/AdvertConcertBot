@@ -94,5 +94,4 @@ class Bot:
 
         if pos:
             method_info.update(pos)
-
         self.vk.method('messages.send', method_info)

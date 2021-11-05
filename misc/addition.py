@@ -43,13 +43,19 @@ def get_path(path: str) -> str:
         return os.path.join(*'home/vk_bot/'.split('/') + path.lower().replace('\\', '/').split('/'))
 
 
-def write_log_file(bot) -> None:
+def convert_error(error):
+    parts = ["Traceback (most recent call last):\n"]
+    parts.extend(traceback.format_tb(error.__traceback__))
+    parts.extend(f'{type(error).__name__}: {error}')
+    return "".join(parts)
+
+
+def write_log_file(bot, error) -> None:
     name = datetime.now().strftime('%m-%d-%Y-%H-%M-%S')
     exception_path = get_path(f"exceptions")
     if not os.path.exists(exception_path):
         os.mkdir(exception_path)
     file_path = f"{exception_path}/{name}.txt"
     with open(file_path, "w", encoding='utf-8') as file:
-        file.write(traceback.format_exc())
+        file.write(convert_error(error))
     bot.send_log_to_admin(name, file_path)
-

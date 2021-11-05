@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 import traceback
 from bot import Bot
 from misc import Settings
@@ -9,11 +10,12 @@ def main():
     bot = Bot()
     try:
         bot.run()
-    except Exception:
+    except Exception as error:
         if Settings.debug:
             traceback.print_exc()
         else:
-            write_log_file(bot)
+            if sys.exc_info()[1] != "[901] Can't send messages for users without permission":
+                write_log_file(bot, error)
             main()
 
 
