@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys
+import socket
 import traceback
 from bot import Bot
 from misc import Settings
@@ -10,6 +10,8 @@ def main():
     bot = Bot()
     try:
         bot.run()
+    except socket.timeout:
+        main()
     except Exception as error:
         if Settings.debug:
             traceback.print_exc()

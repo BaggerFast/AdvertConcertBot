@@ -41,9 +41,13 @@ class Bot:
                     continue
 
     def __group_join_action(self, event) -> None:
-        self.db.create_user_if_not_exists(event.obj.user_id)
-        self.send_msg(user_id=event.obj.user_id,
-                      kb=Keyboards.menu, msg='Чтобы открыть меню напишите "МЕНЮ"', attachment=self.get_audio_massage(event.obj, get_path('audio/hello.mp3')))
+        try:
+            self.send_msg(user_id=event.obj.user_id,
+                          kb=Keyboards.menu, msg='Чтобы открыть меню напишите "МЕНЮ"',
+                          attachment=self.get_audio_massage(event.obj, get_path('audio/hello.mp3')))
+            self.db.create_user_if_not_exists(event.obj.user_id)
+        except vk_api.exceptions.ApiError:
+            pass
 
     def __new_msg_action(self, event) -> None:
         msg = event.obj['message']["text"].strip().lower().split()[-1]
